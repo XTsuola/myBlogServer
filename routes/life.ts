@@ -10,14 +10,11 @@ export function life(router: Router) {
     router.get("/life/recordList", async (ctx: any): Promise<void> => { // 获取生活图片
         const params: any = helpers.getQuery(ctx);
         const data: Document | undefined = await queryAll({}, "life_record");
-        for (let i = 0; i < data.length; i++) {
-            delete data[i].status
-        }
         const data2 = data.reverse();
         ctx.response.body = {
             "code": 200,
             "data": data2,
-            "msg": "操作成功",
+            "msg": "查询成功",
         };
     })
 }

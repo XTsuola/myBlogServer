@@ -9,8 +9,8 @@ import { getTime } from "./func.ts"
 export function travel(router: Router) {
     router.get("/travel/imgList", async (ctx: any): Promise<void> => { // 获取旅游图片
         const params: any = helpers.getQuery(ctx);
-        const data: Document | undefined = await queryAll({status: 0}, "travel_img");
-        for(let i=0;i<data.length;i++) {
+        const data: Document | undefined = await queryAll({ status: 0 }, "travel_img");
+        for (let i = 0; i < data.length; i++) {
             delete data[i].status
         }
         const data2 = data.reverse();
@@ -31,8 +31,8 @@ export function travel(router: Router) {
         const imgName: string = id + 1 + ".jpg";
         const path = `${Deno.cwd()}/public/travel/${imgName}`;
         const base64: any = params.img.replace(
-        /^data:image\/\w+;base64,/,
-        "",
+            /^data:image\/\w+;base64,/,
+            "",
         );
         const dataBuffer: Uint8Array = decode(base64);
         await Deno.writeFile(path, dataBuffer);
@@ -65,6 +65,31 @@ export function travel(router: Router) {
             "code": 200,
             "data": data2,
             "msg": "操作成功",
+        };
+    }).post("/travel/food_add", async (ctx: any): Promise<void> => { // 新增旅游足迹数据信息
+        const params: any = await ctx.request.body({
+            type: "json",
+        }).value;
+        const lastInfo: Document[] = await findLast("travel_foot");
+        let id: number = 0;
+        if (lastInfo.length) {
+            id = lastInfo[0].id;
+        }
+        const sql = {
+            id: id + 1,
+            name: params.name,
+            city: params.city,
+            info: params.info,
+            time: params.time,
+            friend: params.friend,
+            lng: parseFloat(params.lng),
+            lat: parseFloat(params.lat),
+            isHome: 0
+        };
+        const data: any = await add(sql, "travel_foot");
+        ctx.response.body = {
+            "code": 201,
+            "msg": "新增成功",
         };
     })
 }
